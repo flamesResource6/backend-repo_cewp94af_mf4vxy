@@ -4,9 +4,23 @@ from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
 
+# CORS configuration
+# Set ALLOWED_ORIGINS env var as a comma-separated list for production
+# Example: "https://www.labibhospital.co.ke,https://labibhospital.co.ke,https://your-preview.modal.host,http://localhost:3000"
+raw_origins = os.getenv("ALLOWED_ORIGINS")
+if raw_origins:
+    allow_origins = [o.strip() for o in raw_origins.split(",") if o.strip()]
+else:
+    # Safe defaults for dev; tighten in production via ALLOWED_ORIGINS
+    allow_origins = [
+        "*",  # dev fallback
+        "http://localhost:3000",
+        "https://localhost:3000",
+    ]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=allow_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
